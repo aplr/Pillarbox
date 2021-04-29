@@ -1,5 +1,5 @@
 <h1>
-    <img src="https://raw.githubusercontent.com/aplr/Pillarbox/main/Logo.png?token=AAIAWBDVTXVU2WU3NM5UJMDAPPZA4" height="23" />
+    <img src="https://raw.githubusercontent.com/aplr/Pillarbox/main/Logo.png?token=AAIAWBDNQRUM6JJJWSYHN43ASPZJS" height="23" />
     Pillarbox
 </h1>
 
