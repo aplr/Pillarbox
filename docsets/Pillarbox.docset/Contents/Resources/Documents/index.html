@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pillarbox  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+
+    <a title="Pillarbox  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Pillarbox Docs
+        </a>
+         (92% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/aplr/Pillarbox">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Pillarbox Reference</a>
+      <img class="carat" src="img/carat.png" />
+      Pillarbox  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/Pillarbox.html">Pillarbox</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/PillarboxQueueStrategy.html">PillarboxQueueStrategy</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/PillarboxConfiguration.html">PillarboxConfiguration</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            
+            <h1>
+    <img src="https://raw.githubusercontent.com/aplr/Pillarbox/main/Logo.png?token=AAIAWBDNQRUM6JJJWSYHN43ASPZJS" height="23" />
+    Pillarbox
+</h1>
+
+<p><img src="https://github.com/aplr/Pillarbox/workflows/Build/badge.svg?branch=main" alt="Build">
+<img src="https://github.com/aplr/Pillarbox/workflows/Documentation/badge.svg" alt="Documentation"></p>
+
+<p>Pillarbox is an easy-to-use, object-based queue with support for iOS, tvOS and macOS, written purely in Swift. Push and pop operations are both in O(1). All writes are synchronous - this means data will be written to the disk before an operation returns. Furthermore, all operations are thread-safe and synchronized using a read-write lock. This allows for synchronized, concurrent access to read-operations while performing writes in serial.</p>
+<h2 id='about-pillarbox' class='heading'>About Pillarbox</h2>
+
+<p>Pillarbox was originally conceived as a simple object queue that allows to persist unsent messages locally in an efficient and simple way which outlasts app crashes and restarts. For its storage layer, Pillarbox makes use of Pinterest&rsquo;s excellent <a href="https://github.com/pinterest/PINCache">PINCache</a>, which is a key/value store designed for persisting temporary objects on the disk. Beyond that, the <a href="https://swift.org/blog/swift-collections/#deque">Deque</a> data structure from Apple&rsquo;s open source <a href="https://github.com/apple/swift-collections">swift-collections</a> library is used in the internal realization of the queue.</p>
+<h2 id='installation' class='heading'>Installation</h2>
+
+<p>Pillarbox is available via the <a href="https://swift.org/package-manager/">Swift Package Manager</a> which is a tool for managing the distribution of Swift code. It’s integrated with the Swift build system and automates the process of downloading, compiling, and linking dependencies.</p>
+
+<p>Once you have your Swift package set up, adding Pillarbox as a dependency is as easy as adding it to the dependencies value of your Package.swift.</p>
+<pre class="highlight swift"><code><span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
+    <span class="o">.</span><span class="nf">package</span><span class="p">(</span>
+        <span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/aplr/Pillarbox.git"</span><span class="p">,</span>
+        <span class="o">.</span><span class="nf">upToNextMajor</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="s">"1.0.0"</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">]</span>
+</code></pre>
+<h2 id='usage' class='heading'>Usage</h2>
+
+<p>As a bare minimum, you have to specify the name of the Pillarbox which determines the queue file name, as well as the directory where the queue file is stored.</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Pillarbox</span>
+
+<span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URL</span><span class="p">(</span><span class="nv">fileURLWithPath</span><span class="p">:</span> <span class="s">"/path/to/your/app"</span><span class="p">,</span> <span class="nv">isDirectory</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+
+<span class="k">let</span> <span class="nv">pillarbox</span> <span class="o">=</span> <span class="kt">Pillarbox</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"messages"</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+
+<span class="n">pillarbox</span><span class="o">.</span><span class="nf">push</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">)</span>
+<span class="n">pillarbox</span><span class="o">.</span><span class="nf">push</span><span class="p">(</span><span class="s">"World"</span><span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="n">pillarbox</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>   <span class="c1">// 2</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="n">pillarbox</span><span class="o">.</span><span class="nf">pop</span><span class="p">())</span>   <span class="c1">// "Hello"</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">pillarbox</span><span class="o">.</span><span class="nf">pop</span><span class="p">())</span>   <span class="c1">// "World"</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="n">pillarbox</span><span class="o">.</span><span class="n">isEmpty</span><span class="p">)</span> <span class="c1">// true</span>
+</code></pre>
+<h3 id='going-lifo' class='heading'>Going LIFO</h3>
+
+<p>Pillarbox uses a FIFO queue internally per default. If you want to change that behaviour to LIFO, pass a customized <code><a href="Structs/PillarboxConfiguration.html">PillarboxConfiguration</a></code> object with the strategy adjusted like below.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URL</span><span class="p">(</span><span class="nv">fileURLWithPath</span><span class="p">:</span> <span class="s">"/path/to/your/app"</span><span class="p">,</span> <span class="nv">isDirectory</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+
+<span class="k">let</span> <span class="nv">configuration</span> <span class="o">=</span> <span class="kt">PillarboxConfiguration</span><span class="p">(</span><span class="nv">strategy</span><span class="p">:</span> <span class="o">.</span><span class="n">lifo</span><span class="p">)</span>
+
+<span class="k">let</span> <span class="nv">pillarbox</span> <span class="o">=</span> <span class="kt">Pillarbox</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="nv">name</span><span class="p">:</span> <span class="s">"messages"</span><span class="p">,</span>
+    <span class="nv">url</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+    <span class="nv">configuration</span><span class="p">:</span> <span class="n">configuration</span>
+<span class="p">)</span>
+
+<span class="c1">// ...</span>
+</code></pre>
+<h2 id='documentation' class='heading'>Documentation</h2>
+
+<p>Documentation is available <a href="https://pillarbox.aplr.io">here</a> and provides a comprehensive documentation of the library&rsquo;s public interface. Expect usage examples and guides to be added shortly.</p>
+<h2 id='license' class='heading'>License</h2>
+
+<p>Pillarbox is licensed under the <a href="https://github.com/aplr/Pillarbox/blob/main/LICENSE">MIT License</a>.</p>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2021 <a class="link" href="https://github.com/aplr" target="_blank" rel="external">Andreas Pfurtscheller</a>. All rights reserved. (Last updated: 2021-04-30)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

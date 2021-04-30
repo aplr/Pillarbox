@@ -1,0 +1,12 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/runner/work/Pillarbox/Pillarbox/Sources/Pillarbox/Pillarbox.swift",
+      "line": 28,
+      "symbol": "PillarboxConfiguration.init(strategy:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/runner/work/Pillarbox/Pillarbox"
+}
