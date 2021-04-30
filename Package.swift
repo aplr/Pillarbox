@@ -5,9 +5,10 @@ import PackageDescription
 let package = Package(
     name: "Pillarbox",
     platforms: [
-        .iOS(.v10),
-        .tvOS(.v10),
-        .macOS(.v10_12)
+        .macOS(.v10_10),
+        .iOS(.v9),
+        .tvOS(.v9),
+        .watchOS(.v2)
     ],
     products: [
         .library(
