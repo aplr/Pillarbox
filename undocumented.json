@@ -6,6 +6,13 @@
       "symbol": "PillarboxConfiguration.init(strategy:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Pillarbox/Pillarbox/Sources/Pillarbox/Pillarbox.swift",
+      "line": 238,
+      "symbol": "Pillarbox.subscript(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.subscript",
+      "warning": "undocumented"
     }
   ],
   "source_directory": "/Users/runner/work/Pillarbox/Pillarbox"
