@@ -1,20 +1,26 @@
 import XCTest
 @testable import Pillarbox
 
+struct TestIdentifiable: QueueIdentifiable, Identifiable, Codable, Hashable {
+    
+    let id: String
+
+}
+
 final class PillarboxTests: XCTestCase {
     
-    func createPillarbox(
+    func createPillarbox<E>(
         named name: String = UUID().uuidString,
         strategy: PillarboxQueueStrategy = .fifo
-    ) -> Pillarbox<String> {
+    ) -> Pillarbox<E> {
         let url = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
         let configuration = PillarboxConfiguration(strategy: strategy)
         
-        return Pillarbox<String>(name: name, url: url, configuration: configuration)
+        return Pillarbox<E>(name: name, url: url, configuration: configuration)
     }
     
     func testInitPillarbox() {
-        XCTAssertNoThrow(createPillarbox())
+        XCTAssertNoThrow(createPillarbox() as Pillarbox<String>)
     }
     
     func testInitFromPersistedPillarbox() {
@@ -22,7 +28,7 @@ final class PillarboxTests: XCTestCase {
         
         // Arrange: Create a new pillarbox and
         // populate it with test data.
-        var pillarbox = createPillarbox(named: name)
+        var pillarbox: Pillarbox<String> = createPillarbox(named: name)
         pillarbox.push("Hello")
         pillarbox.push("World")
         
@@ -38,7 +44,7 @@ final class PillarboxTests: XCTestCase {
     
     func testPopFifo() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         pillarbox.push("One")
         pillarbox.push("Two")
         
@@ -51,7 +57,7 @@ final class PillarboxTests: XCTestCase {
     
     func testPopLifo() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .lifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .lifo)
         pillarbox.push("One")
         pillarbox.push("Two")
         
@@ -64,7 +70,7 @@ final class PillarboxTests: XCTestCase {
     
     func testPopEmpty() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .lifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .lifo)
         
         // Act
         let result = pillarbox.pop()
@@ -75,7 +81,7 @@ final class PillarboxTests: XCTestCase {
     
     func testPeekFifo() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         pillarbox.push("One")
         pillarbox.push("Two")
         
@@ -88,7 +94,7 @@ final class PillarboxTests: XCTestCase {
     
     func testPeekLifo() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .lifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .lifo)
         pillarbox.push("One")
         pillarbox.push("Two")
         
@@ -101,7 +107,7 @@ final class PillarboxTests: XCTestCase {
     
     func testPeekIdempotent() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         pillarbox.push("One")
         pillarbox.push("Two")
         
@@ -116,7 +122,7 @@ final class PillarboxTests: XCTestCase {
     
     func testPeekEmpty() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         
         // Act
         let result = pillarbox.peek()
@@ -127,7 +133,7 @@ final class PillarboxTests: XCTestCase {
     
     func testIsEmptyWhenEmpty() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         
         // Act
         let result = pillarbox.isEmpty
@@ -138,7 +144,7 @@ final class PillarboxTests: XCTestCase {
     
     func testIsEmptyWhenNotEmpty() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         pillarbox.push("Hello")
         
         // Act
@@ -150,7 +156,7 @@ final class PillarboxTests: XCTestCase {
     
     func testCountWhenEmpty() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         
         // Act
         let result = pillarbox.count
@@ -161,7 +167,7 @@ final class PillarboxTests: XCTestCase {
     
     func testCountWhenNotEmpty() {
         // Arrange
-        let pillarbox = createPillarbox(strategy: .fifo)
+        let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
         pillarbox.push("Hello")
         
         // Act
@@ -169,5 +175,19 @@ final class PillarboxTests: XCTestCase {
         
         // Assert
         XCTAssertEqual(result, 1)
+    }
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    func testIdentifiableConformsToQueueIdentifiable() {
+        // Arrange
+        let pillarbox: Pillarbox<TestIdentifiable> = createPillarbox(strategy: .fifo)
+        let identifiable = TestIdentifiable(id: UUID().uuidString)
+        pillarbox.push(identifiable)
+        
+        // Act
+        let result = pillarbox[identifiable.id]
+        
+        // Assert
+        XCTAssertEqual(result, identifiable)
     }
 }

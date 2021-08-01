@@ -72,4 +72,9 @@ class Queue<Element>: Codable where Element: Codable {
     var count: Int {
         queue.count
     }
+    
+    @usableFromInline
+    var elements: [Element] {
+        Array(queue)
+    }
 }

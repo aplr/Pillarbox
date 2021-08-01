@@ -30,6 +30,17 @@ public struct PillarboxConfiguration {
     }
 }
 
+/// A class of types whose instances hold the value of an entity with stable identity.
+public protocol QueueIdentifiable {
+    
+    /// The stable identity of the entity associated with this instance.
+    var id: String { get }
+
+}
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+extension Identifiable where Self: QueueIdentifiable, ID == String {}
+
 /// A object-based queue which is persisted to the disk. Supports both FIFO and LIFO strategies. Should be thread-safe as well.
 public class Pillarbox<Element: Codable> {
     
@@ -94,6 +105,15 @@ public class Pillarbox<Element: Codable> {
     @usableFromInline
     func writeQueue(queue: Queue<String>) {
         cache["_queue"] = queue
+    }
+    
+    @usableFromInline
+    func identifier(for element: Element) -> String {
+        guard let identifiable = element as? QueueIdentifiable else {
+            return UUID().uuidString
+        }
+        
+        return identifiable.id
     }
 }
 
@@ -166,10 +186,12 @@ public extension Pillarbox {
     /// Pushes the specified element into the queue and persist it on the disk.
     ///
     /// - Parameter element: The element to push into the queue.
+    /// - Returns: The key which identifies the element
     @inlinable
-    func push(_ element: Element) {
+    @discardableResult
+    func push(_ element: Element) -> String {
         // Generate a random element identifier
-        let key = UUID().uuidString
+        let key = identifier(for: element)
         // Lock for writing
         lockWrite()
         // Be sure to unlock as we leave the function
@@ -180,6 +202,8 @@ public extension Pillarbox {
         queue.push(key)
         // Persist the updated queue to disk
         writeQueue(queue: queue)
+        // Return the key
+        return key
     }
     
     /// A Boolean value indicating whether the queue is empty.
@@ -202,6 +226,17 @@ public extension Pillarbox {
         defer { unlock() }
         // Return result
         return queue.count
+    }
+    
+    /// All elements in the queue
+    @inlinable
+    var elements: [Element] {
+        return queue.elements.compactMap({ cache[$0] })
+    }
+    
+    @inlinable
+    subscript(key: String) -> Element? {
+        return cache[key]
     }
 }
 
