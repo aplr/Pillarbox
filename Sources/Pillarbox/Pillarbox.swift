@@ -227,6 +227,13 @@ public extension Pillarbox {
         // Return result
         return queue.count
     }
+}
+
+
+// MARK: - Access and Manipulate Queue Data
+
+
+public extension Pillarbox {
     
     /// All elements in the queue
     @inlinable
@@ -234,9 +241,46 @@ public extension Pillarbox {
         return queue.elements.compactMap({ cache[$0] })
     }
     
+    /// Updates the specified element in the queue with the given key.
+    ///
+    /// - Parameters:
+    ///   - element: The element to update
+    ///   - key: The cache key representing the element
+    @inlinable
+    func update(_ element: Element, for key: String) {
+        // Return early if no element with the given key exists
+        guard let _: Element = cache[key] else { return }
+        // Don't update the element if the key does not match
+        guard let identifiable = element as? QueueIdentifiable, identifiable.id == key else { return }
+        // Lock for writing
+        lockWrite()
+        // Be sure to unlock as we leave the function
+        defer { unlock() }
+        // Store the element to the disk
+        cache[key] = element
+    }
+    
     @inlinable
     subscript(key: String) -> Element? {
-        return cache[key]
+        get {
+            return cache[key]
+        } set {
+            guard let newValue = newValue else { return }
+            self.update(newValue, for: key)
+        }
+    }
+}
+
+
+// MARK: - Performing Queue Operations
+
+public extension Pillarbox where Element: QueueIdentifiable {
+    
+    /// Updates the specified identifiable element in the queue
+    /// - Parameter element: The element to update
+    @inlinable
+    func update(_ element: Element) {
+        self.update(element, for: element.id)
     }
 }
 
