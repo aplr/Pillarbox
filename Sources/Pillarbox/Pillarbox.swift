@@ -260,6 +260,21 @@ public extension Pillarbox {
         cache[key] = element
     }
     
+    /// Removes the element identified by the given key.
+    ///
+    /// - Parameter key: The key of the element to remove
+    @inlinable
+    func remove(key: String) {
+        // Lock for writing
+        lockWrite()
+        // Be sure to unlock as we leave the function
+        defer { unlock() }
+        // Remove the key from the queue
+        queue.remove(key)
+        // Remove the element from the cache
+        cache.remove(forKey: key)
+    }
+    
     @inlinable
     subscript(key: String) -> Element? {
         get {
@@ -277,10 +292,19 @@ public extension Pillarbox {
 public extension Pillarbox where Element: QueueIdentifiable {
     
     /// Updates the specified identifiable element in the queue
+    ///
     /// - Parameter element: The element to update
     @inlinable
     func update(_ element: Element) {
         self.update(element, for: element.id)
+    }
+    
+    /// Removes the element from the queue.
+    ///
+    /// - Parameter element: The element to remove
+    @inlinable
+    func remove(_ element: Element) {
+        self.remove(key: element.id)
     }
 }
 

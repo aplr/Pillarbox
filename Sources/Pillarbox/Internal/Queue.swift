@@ -64,6 +64,13 @@ class Queue<Element>: Codable where Element: Codable {
     }
     
     @usableFromInline
+    func remove(where predicate: (Element) throws -> Bool) rethrows {
+        if let index = try queue.firstIndex(where: predicate) {
+            queue.remove(at: index)
+        }
+    }
+    
+    @usableFromInline
     var isEmpty: Bool {
         queue.isEmpty
     }
@@ -76,5 +83,15 @@ class Queue<Element>: Codable where Element: Codable {
     @usableFromInline
     var elements: [Element] {
         Array(queue)
+    }
+}
+
+extension Queue where Element: Equatable {
+    
+    @usableFromInline
+    func remove(_ element: Element) {
+        if let index = queue.firstIndex(of: element) {
+            queue.remove(at: index)
+        }
     }
 }

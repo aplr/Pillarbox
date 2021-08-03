@@ -1,7 +1,7 @@
 import XCTest
 @testable import Pillarbox
 
-struct TestIdentifiable: QueueIdentifiable, Identifiable, Codable, Hashable {
+struct TestIdentifiable: QueueIdentifiable, Codable, Hashable {
     
     let id: String
 
@@ -131,6 +131,18 @@ final class PillarboxTests: XCTestCase {
         XCTAssertNil(result)
     }
     
+    func testRemove() {
+        // Arrange
+        let pillarbox: Pillarbox<String> = createPillarbox()
+        let key = pillarbox.push("One")
+        
+        // Act
+        pillarbox.remove(key: key)
+        
+        // Assert
+        XCTAssert(pillarbox.isEmpty)
+    }
+    
     func testIsEmptyWhenEmpty() {
         // Arrange
         let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)
@@ -177,7 +189,6 @@ final class PillarboxTests: XCTestCase {
         XCTAssertEqual(result, 1)
     }
     
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func testIdentifiableConformsToQueueIdentifiable() {
         // Arrange
         let pillarbox: Pillarbox<TestIdentifiable> = createPillarbox(strategy: .fifo)
