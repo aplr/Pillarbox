@@ -143,6 +143,30 @@ final class PillarboxTests: XCTestCase {
         XCTAssert(pillarbox.isEmpty)
     }
     
+    func testPut() {
+        // Arrange
+        let pillarbox: Pillarbox<String> = createPillarbox()
+        let key = UUID().uuidString
+        
+        // Act
+        pillarbox.put("One", for: key)
+        
+        // Assert
+        XCTAssertEqual(pillarbox[key], "One")
+    }
+    
+    func testPutDoesUpdate() {
+        // Arrange
+        let pillarbox: Pillarbox<String> = createPillarbox()
+        let key = pillarbox.push("One")
+        
+        // Act
+        pillarbox.put("Two", for: key)
+        
+        // Assert
+        XCTAssertEqual(pillarbox[key], "Two")
+    }
+    
     func testIsEmptyWhenEmpty() {
         // Arrange
         let pillarbox: Pillarbox<String> = createPillarbox(strategy: .fifo)

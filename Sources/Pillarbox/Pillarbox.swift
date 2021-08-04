@@ -271,7 +271,7 @@ public extension Pillarbox {
     @inlinable
     func put(_ element: Element, for key: String) {
         // Don't set the element if the key does not match
-        guard let identifiable = element as? QueueIdentifiable, identifiable.id == key else { return }
+        if let identifiable = element as? QueueIdentifiable, identifiable.id != key { return }
         // Lock for writing
         lockWrite()
         // Be sure to unlock as we leave the function
