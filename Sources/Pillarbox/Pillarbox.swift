@@ -238,6 +238,11 @@ public extension Pillarbox {
     /// All elements in the queue
     @inlinable
     var elements: [Element] {
+        // Lock for read
+        lockRead()
+        // Be sure to unlock as we leave the function
+        defer { unlock() }
+        // Return result
         return queue.elements.compactMap({ cache[$0] })
     }
     
@@ -248,14 +253,31 @@ public extension Pillarbox {
     ///   - key: The cache key representing the element
     @inlinable
     func update(_ element: Element, for key: String) {
+        // Lock for reading
+        lockRead()
         // Return early if no element with the given key exists
         guard let _: Element = cache[key] else { return }
-        // Don't update the element if the key does not match
+        // Unlock after we determined if the key exists
+        unlock()
+        // Update the element
+        put(element, for: key)
+    }
+    
+    /// Puts the specified element in the queue with the given key.
+    ///
+    /// - Parameters:
+    ///   - element: The element to put
+    ///   - key: The cache key representing the element
+    @inlinable
+    func put(_ element: Element, for key: String) {
+        // Don't set the element if the key does not match
         guard let identifiable = element as? QueueIdentifiable, identifiable.id == key else { return }
         // Lock for writing
         lockWrite()
         // Be sure to unlock as we leave the function
         defer { unlock() }
+        // Push the element to the queue if it does not exist yet
+        if (cache[key] as Element?) == nil { queue.push(key) }
         // Store the element to the disk
         cache[key] = element
     }
@@ -297,6 +319,14 @@ public extension Pillarbox where Element: QueueIdentifiable {
     @inlinable
     func update(_ element: Element) {
         self.update(element, for: element.id)
+    }
+    
+    /// Puts the specified identifiable element into the queue
+    ///
+    /// - Parameter element: The element to put
+    @inlinable
+    func put(_ element: Element) {
+        self.put(element, for: element.id)
     }
     
     /// Removes the element from the queue.
